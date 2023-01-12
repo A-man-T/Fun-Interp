@@ -1,0 +1,23 @@
+
+- True/False: Working with character strings in C is unpleasant. Explain.
+
+- What is your favorite programming language? explain.
+
+- What is your least favorite programming language? explain.
+
+- Read about statically typed vs dynamically typed programming languages
+  and explain the difference
+
+- Read about strongly typed vs. weakly typed programming languages
+  and explain the difference
+
+- Read about interpreted vs. compiled programming languages and
+  explain the difference
+
+- How do you classify the following languages in terms of the above?
+
+      * Python
+      * Java
+      * C
+      * C++
+      * fun
