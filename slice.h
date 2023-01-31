@@ -25,7 +25,8 @@
 // This class is intended as a light-weight wrapper around pointer and length
 // and should be passed around by value.
 //
-class Slice {
+class Slice
+{
 public:
   char const *const start; // where does the string start in memory?
                            // The 2 uses of 'const' express different ideas:
@@ -41,25 +42,30 @@ public:
   inline Slice(char const *const start, char const *const end)
       : start{start}, len{size_t(end - start)} {}
 
-  inline bool operator==(char const *p) const {
-    for (size_t i = 0; i < len; i++) {
+  inline bool operator==(char const *p) const
+  {
+    for (size_t i = 0; i < len; i++)
+    {
       if (p[i] != start[i])
         return false;
     }
     return p[len] == 0;
   }
 
-  bool operator==(const Slice &other) const {
+  bool operator==(const Slice &other) const
+  {
     if (len != other.len)
       return false;
-    for (size_t i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++)
+    {
       if (other.start[i] != start[i])
         return false;
     }
     return true;
   }
 
-  bool is_identifier() {
+  bool is_identifier()
+  {
     if (len == 0)
       return 0;
     if (!isalpha(start[0]))
@@ -70,18 +76,24 @@ public:
     return true;
   }
 
-  void print() const {
-    for (size_t i = 0; i < len; i++) {
+  void print() const
+  {
+    for (size_t i = 0; i < len; i++)
+    {
       printf("%c", start[i]);
     }
   }
 };
 
-template <> struct std::hash<Slice> {
-  std::size_t operator()(const Slice &key) const {
+template <>
+struct std::hash<Slice>
+{
+  std::size_t operator()(const Slice &key) const
+  {
     // djb2
     size_t out = 5381;
-    for (size_t i = 0; i < key.len; i++) {
+    for (size_t i = 0; i < key.len; i++)
+    {
       char const c = key.start[i];
       out = out * 33 + c;
     }
