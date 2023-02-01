@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdnoreturn.h>
+#include <inttypes.h>
 
 typedef struct Interpreter
 {
@@ -20,6 +21,7 @@ typedef struct Interpreter
 } Interpreter;
 
 uint64_t expression(bool effects, Interpreter *interp);
+void statements(bool effects, Interpreter *interp);
 
 void skip(Interpreter *interp)
 {
@@ -52,6 +54,24 @@ bool consume(const char *str, Interpreter *interp)
         i += 1;
     }
 }
+
+void skipCurlyBraces(bool effects, Interpreter *interp){
+    uint64_t countBraces = 1;
+    while(countBraces!=0){
+        if(consume("{",interp)){
+            countBraces++;
+        }
+        else if(consume("}",interp)){
+            countBraces--;
+        }
+        else{
+            interp->current+=1;
+        }
+    }
+
+    
+}
+
 
 noreturn void fail(Interpreter *interp)
 {
@@ -176,8 +196,11 @@ uint64_t e2(bool effects, Interpreter *interp)
             }
         }
         else{
-            if(counter%2==0)
+            if(counter ==0)
                 return e1(effects,interp);
+            else if (counter%2==0){
+                return !!e1(effects,interp);
+            }
             else
                 return !e1(effects,interp);
         }
@@ -321,7 +344,7 @@ uint64_t e11(bool effects, Interpreter *interp)
     {
         if (consume("&&", interp))
         {
-            v = (v && e10(effects, interp));
+            v = (e10(effects, interp) && v);
         }
         else
         {
@@ -339,7 +362,7 @@ uint64_t e12(bool effects, Interpreter *interp)
     {
         if (consume("||", interp))
         {
-            v = (e11(effects, interp) || v );
+            v = (e11(effects, interp) || v);
         }
         else
         {
@@ -380,10 +403,59 @@ bool statement(bool effects, Interpreter *interp)
         uint64_t v = expression(effects, interp);
         if (effects)
         {
-            printf("%ld\n", v);
+            printf("%"PRIu64"\n", v);
         }
         return true;
     }
+    else if (consume("if",interp)){
+        uint64_t v = expression(effects, interp);
+        if (effects){
+            if(v){
+                consume("{",interp);
+                statements(effects,interp);
+                consume("}",interp);
+                if (consume("else",interp)){
+                    consume("{",interp);
+                    skipCurlyBraces(effects,interp);
+                }
+            }
+
+            else{
+                consume("{",interp);
+                skipCurlyBraces(effects,interp);
+                if (consume("else",interp)){
+                    consume("{",interp);
+                    statements(effects,interp);
+                    consume("}",interp);
+                }
+
+            }
+            return true;
+        }
+
+    }
+    else if (consume("while",interp)){
+        char const *reeval = interp->current;
+        uint64_t v = expression(effects, interp);
+        char const *commands = interp->current;
+        if (effects){
+            if(v){
+                while(v){
+                    consume("{",interp);
+                    statements(effects,interp);
+                    consume("}",interp);
+                    interp->current=reeval;
+                    v = expression(effects, interp);
+                }
+            }
+
+            interp->current=commands;
+            consume("{",interp);
+            skipCurlyBraces(effects,interp);
+            return true;
+        }
+    }
+
     else if (id = consume_identifier(interp), id.hasValue)
     {
         // x = ...
@@ -406,8 +478,7 @@ bool statement(bool effects, Interpreter *interp)
 
 void statements(bool effects, Interpreter *interp)
 {
-    while (statement(effects, interp))
-        ;
+    while (statement(effects, interp));
 }
 
 void run(Interpreter *interp)
