@@ -1,58 +1,65 @@
-add = 100
-subtract = 2
-print add + 5
-print 11111111111
+x = 20
+y = 18446744073709551616
+z = 1
+a = 420
+fun f1(x,y,z){
+    if(y!=0){
+        return f1(x,y+1,z)
+    }
+    else{
+        return 1
+    }
+}
 
-subtract = add
-print subtract - 1
-print add
-subtract = subtract - 1
-print subtract
-print 11111111111
-
-multiply = 10 
-print multiply * 10
-print 11111111111
-
-divide = 80
-print divide/10
-print divide/9
-print divide
-print 11111111111
-
-orderOfOperations = 12
-print orderOfOperations*100/(12+40)+(5*10+5)-10*16
-print 11111111111
+print (f1(x,y,x-1))
 
 
-print 9-3*3+1
-print 6/2*(1+2)
-print 10/(20/4*5/5)*8-2
-print 10*40-2*(16/4)/2*2+9
-print 11111111111
+fun f2(x,y,z){
+    while (x!=50){
+        x = x+1
+    }
+    return f1(x,y,z)  
+}
 
+fun f3(x,y,z){
+    while (z!=10){
+        z = z+1
+    }
+    return f2(x,y,z)  
+}
 
-print 1-2
-print (1-2)*5
-negative = 1-2
-print negative*10/5*6+3
-print 11111111111
+print (f3(x,y,z))
+print (x)
+print (y)
+print (z)
 
+fun testOperators(x, y, z){
 
+    x = 1
+    y = 1
+    z = 1
+    print (!x)
+    print (5*x)
+    print (5/(5*x))
+    z = 10
+    print (10%5)
+    print (x<z)
+    print (x<=y)
+    print (x<y)
+    print (x>y)
+    print (x>=y)
+    print (z==z)
+    print (z!=z)
+    print (1||0)
+    print (0||1)
+    print (0||0)
+    print (1||1)
+    print (1&&0)
+    print (0&&1)
+    print (0&&0)
+    print (1&&1)
+    
 
-bitMax = 18446744073709551616
-print bitMax
-print bitMax+11
-print bitMax-bitMax-bitMax
-print 11111111111
-
-
-signedIntegers = 5
-print signedIntegers
-signedIntegers = 9223372036854775807
-print signedIntegers
-print signedIntegers+11
-print signedIntegers-signedIntegers-signedIntegers
-print 11111111111
-
-@xdProgramStop = 14
+}
+print (a)
+print (testOperators(x,y,a))
