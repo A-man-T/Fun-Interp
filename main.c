@@ -167,7 +167,19 @@ uint64_t e1(bool effects, Interpreter *interp)
 // ++ -- unary+ unary- ... (Right)
 uint64_t e2(bool effects, Interpreter *interp)
 {
-    return e1(effects, interp);
+    uint64_t v;
+
+    while (true)
+    {
+        if (consume("!", interp))
+        {
+            v = !e2(effects, interp);
+        }
+        else
+        {
+            return v;
+        }
+    }
 }
 
 // * / % (Left)
@@ -266,11 +278,11 @@ uint64_t e7(bool effects, Interpreter *interp)
     {
         if (consume("==", interp))
         {
-            v = (v == e5(effects, interp)? 1 : 0);
+            v = (v == e6(effects, interp)? 1 : 0);
         }
         else if (consume("!=", interp))
         {
-            v = (v != e5(effects, interp)? 1 : 0);
+            v = (v != e6(effects, interp)? 1 : 0);
         }
         else
         {

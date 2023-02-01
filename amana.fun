@@ -63,3 +63,5 @@ fun testOperators(x, y, z){
 }
 print (a)
 print (testOperators(x,y,a))
+print (!1)
+print (!!1)
