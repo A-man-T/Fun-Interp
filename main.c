@@ -55,23 +55,25 @@ bool consume(const char *str, Interpreter *interp)
     }
 }
 
-void skipCurlyBraces(bool effects, Interpreter *interp){
+void skipCurlyBraces(bool effects, Interpreter *interp)
+{
     uint64_t countBraces = 1;
-    while(countBraces!=0){
-        if(consume("{",interp)){
+    while (countBraces != 0)
+    {
+        if (consume("{", interp))
+        {
             countBraces++;
         }
-        else if(consume("}",interp)){
+        else if (consume("}", interp))
+        {
             countBraces--;
         }
-        else{
-            interp->current+=1;
+        else
+        {
+            interp->current += 1;
         }
     }
-
-    
 }
-
 
 noreturn void fail(Interpreter *interp)
 {
@@ -149,7 +151,6 @@ Interpreter newInterp(char const *prog)
     return i1;
 }
 
-
 // The plan is to honor as many C operators as possible with
 // the same precedence and associativity
 // e<n> implements operators with precedence 'n' (smaller is higher)
@@ -188,21 +189,26 @@ uint64_t e1(bool effects, Interpreter *interp)
 uint64_t e2(bool effects, Interpreter *interp)
 {
     uint64_t counter = 0;
-    while (true){
-        if(consume("!",interp)){
+    while (true)
+    {
+        if (consume("!", interp))
+        {
             counter++;
-            while(consume("!",interp)){
+            while (consume("!", interp))
+            {
                 counter++;
             }
         }
-        else{
-            if(counter ==0)
-                return e1(effects,interp);
-            else if (counter%2==0){
-                return !!e1(effects,interp);
+        else
+        {
+            if (counter == 0)
+                return e1(effects, interp);
+            else if (counter % 2 == 0)
+            {
+                return !!e1(effects, interp);
             }
             else
-                return !e1(effects,interp);
+                return !e1(effects, interp);
         }
     }
 }
@@ -338,7 +344,7 @@ uint64_t e10(bool effects, Interpreter *interp)
 uint64_t e11(bool effects, Interpreter *interp)
 {
 
-     uint64_t v = e10(effects, interp);
+    uint64_t v = e10(effects, interp);
 
     while (true)
     {
@@ -403,55 +409,63 @@ bool statement(bool effects, Interpreter *interp)
         uint64_t v = expression(effects, interp);
         if (effects)
         {
-            printf("%"PRIu64"\n", v);
+            printf("%" PRIu64 "\n", v);
         }
         return true;
     }
-    else if (consume("if",interp)){
+    else if (consume("if", interp))
+    {
         uint64_t v = expression(effects, interp);
-        if (effects){
-            if(v){
-                consume("{",interp);
-                statements(effects,interp);
-                consume("}",interp);
-                if (consume("else",interp)){
-                    consume("{",interp);
-                    skipCurlyBraces(effects,interp);
+        if (effects)
+        {
+            if (v)
+            {
+                consume("{", interp);
+                statements(effects, interp);
+                consume("}", interp);
+                if (consume("else", interp))
+                {
+                    consume("{", interp);
+                    skipCurlyBraces(effects, interp);
                 }
             }
 
-            else{
-                consume("{",interp);
-                skipCurlyBraces(effects,interp);
-                if (consume("else",interp)){
-                    consume("{",interp);
-                    statements(effects,interp);
-                    consume("}",interp);
+            else
+            {
+                consume("{", interp);
+                skipCurlyBraces(effects, interp);
+                if (consume("else", interp))
+                {
+                    consume("{", interp);
+                    statements(effects, interp);
+                    consume("}", interp);
                 }
-
             }
             return true;
         }
-
     }
-    else if (consume("while",interp)){
+    else if (consume("while", interp))
+    {
         char const *reeval = interp->current;
         uint64_t v = expression(effects, interp);
         char const *commands = interp->current;
-        if (effects){
-            if(v){
-                while(v){
-                    consume("{",interp);
-                    statements(effects,interp);
-                    consume("}",interp);
-                    interp->current=reeval;
+        if (effects)
+        {
+            if (v)
+            {
+                while (v)
+                {
+                    consume("{", interp);
+                    statements(effects, interp);
+                    consume("}", interp);
+                    interp->current = reeval;
                     v = expression(effects, interp);
                 }
             }
 
-            interp->current=commands;
-            consume("{",interp);
-            skipCurlyBraces(effects,interp);
+            interp->current = commands;
+            consume("{", interp);
+            skipCurlyBraces(effects, interp);
             return true;
         }
     }
@@ -478,7 +492,8 @@ bool statement(bool effects, Interpreter *interp)
 
 void statements(bool effects, Interpreter *interp)
 {
-    while (statement(effects, interp));
+    while (statement(effects, interp))
+        ;
 }
 
 void run(Interpreter *interp)
