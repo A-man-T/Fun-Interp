@@ -259,7 +259,24 @@ uint64_t e6(bool effects, Interpreter *interp)
 // == !=
 uint64_t e7(bool effects, Interpreter *interp)
 {
-    return e6(effects, interp);
+
+    uint64_t v = e6(effects, interp);
+
+    while (true)
+    {
+        if (consume("==", interp))
+        {
+            v = (v == e5(effects, interp)? 1 : 0);
+        }
+        else if (consume("!=", interp))
+        {
+            v = (v != e5(effects, interp)? 1 : 0);
+        }
+        else
+        {
+            return v;
+        }
+    }
 }
 
 // (left) &
