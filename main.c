@@ -167,17 +167,19 @@ uint64_t e1(bool effects, Interpreter *interp)
 // ++ -- unary+ unary- ... (Right)
 uint64_t e2(bool effects, Interpreter *interp)
 {
-    uint64_t v;
-
-    while (true)
-    {
-        if (consume("!", interp))
-        {
-            v = !e2(effects, interp);
+    uint64_t counter = 0;
+    while (true){
+        if(consume("!",interp)){
+            counter++;
+            while(consume("!",interp)){
+                counter++;
+            }
         }
-        else
-        {
-            return v;
+        else{
+            if(counter%2==0)
+                return e1(effects,interp);
+            else
+                return !e1(effects,interp);
         }
     }
 }
@@ -247,19 +249,19 @@ uint64_t e6(bool effects, Interpreter *interp)
     {
         if (consume("<=", interp))
         {
-            v = (v <= e5(effects, interp)? 1 : 0);
+            v = (v <= e5(effects, interp));
         }
         else if (consume("<", interp))
         {
-            v = (v < e5(effects, interp)? 1 : 0);
+            v = (v < e5(effects, interp));
         }
         else if (consume(">=", interp))
         {
-            v = (v >= e5(effects, interp)? 1 : 0);
+            v = (v >= e5(effects, interp));
         }
         else if (consume(">", interp))
         {
-            v = (v > e5(effects, interp)? 1 : 0);
+            v = (v > e5(effects, interp));
         }
         else
         {
@@ -278,11 +280,11 @@ uint64_t e7(bool effects, Interpreter *interp)
     {
         if (consume("==", interp))
         {
-            v = (v == e6(effects, interp)? 1 : 0);
+            v = (v == e6(effects, interp));
         }
         else if (consume("!=", interp))
         {
-            v = (v != e6(effects, interp)? 1 : 0);
+            v = (v != e6(effects, interp));
         }
         else
         {
@@ -312,13 +314,38 @@ uint64_t e10(bool effects, Interpreter *interp)
 // &&
 uint64_t e11(bool effects, Interpreter *interp)
 {
-    return e10(effects, interp);
+
+     uint64_t v = e10(effects, interp);
+
+    while (true)
+    {
+        if (consume("&&", interp))
+        {
+            v = (v && e10(effects, interp));
+        }
+        else
+        {
+            return v;
+        }
+    }
 }
 
 // ||
 uint64_t e12(bool effects, Interpreter *interp)
 {
-    return e11(effects, interp);
+    uint64_t v = e11(effects, interp);
+
+    while (true)
+    {
+        if (consume("||", interp))
+        {
+            v = (e11(effects, interp) || v );
+        }
+        else
+        {
+            return v;
+        }
+    }
 }
 
 // (right with special treatment for middle expression) ?:
