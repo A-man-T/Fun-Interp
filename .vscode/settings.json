@@ -2,6 +2,9 @@
     "files.associations": {
         "mman.h": "c",
         "linkedlist.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "scope": "c",
+        "functionlinkedlist.h": "c",
+        "ratio": "c"
     }
 }

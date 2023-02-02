@@ -1,6 +1,7 @@
 #include "cslice.h"
 #include "linkedlist.h"
 #include "functionlinkedlist.h"
+#include "scope.h"
 #include "optionalSlice.h"
 #include "optionalInt.h"
 #include <sys/mman.h>
@@ -165,8 +166,18 @@ uint64_t e1(bool effects, Interpreter *interp)
 
     if (id = consume_identifier(interp), id.hasValue)
     {
-        uint64_t v = find(id.value).value;
-        return v;
+        if(effects){
+            uint64_t v = find(id.value).value;
+            return v;
+        }
+        else{
+            optionalInt v = findLocal(id.value);
+            if(v.hasValue)
+                return v.value;
+            uint64_t x = find(id.value).value;
+            return x;
+        }
+        
     }
     else if (v = consume_literal(interp), v.hasValue)
     {
@@ -408,10 +419,7 @@ bool statement(bool effects, Interpreter *interp)
     {
         // print ...
         uint64_t v = expression(effects, interp);
-        if (effects)
-        {
-            printf("%" PRIu64 "\n", v);
-        }
+        printf("%" PRIu64 "\n", v);
         return true;
     }
     //need to change this
@@ -446,8 +454,7 @@ bool statement(bool effects, Interpreter *interp)
     else if (consume("if", interp))
     {
         uint64_t v = expression(effects, interp);
-        if (effects)
-        {
+
             if (v)
             {
                 consume("{", interp);
@@ -472,15 +479,12 @@ bool statement(bool effects, Interpreter *interp)
                 }
             }
             return true;
-        }
     }
     else if (consume("while", interp))
     {
         char const *reeval = interp->current;
         uint64_t v = expression(effects, interp);
         char const *commands = interp->current;
-        if (effects)
-        {
             if (v)
             {
                 while (v)
@@ -497,7 +501,6 @@ bool statement(bool effects, Interpreter *interp)
             consume("{", interp);
             skipCurlyBraces(effects, interp);
             return true;
-        }
     }
 
     else if (id = consume_identifier(interp), id.hasValue)
@@ -510,6 +513,55 @@ bool statement(bool effects, Interpreter *interp)
             {
                 insert(id.value, v);
             }
+            else{
+                optionalInt x = findLocal(id.value);
+                if(x.hasValue){
+                    insertLocal(id.value,v);
+                    return true;
+                }
+                else if(find(id.value).hasValue){
+                    insert(id.value,v);
+                }
+                else{
+                    insertLocal(id.value,v);
+                }
+            
+
+                //write the code to check if in local, then check global, then add to local
+            }
+            return true;
+        }
+        else if(findFunction(id.value)!=NULL){
+            struct functionNode * funcSpecs = findFunction(id.value);
+            struct localScopeVariables * funcValues = getNewLocalScope(funcSpecs->numParams);
+            consume("(",interp);
+            for(uint64_t counter = 0; counter<funcSpecs->numParams;counter++){
+                uint64_t v = expression(effects, interp);
+                funcValues->values[counter] = v;
+                funcValues->names[counter] = funcSpecs->params[counter];
+                consume(",",interp);
+            }
+            funcValues->filledTo = funcSpecs->numParams-1;
+            consume(")",interp);
+            char const *oldLocation = interp->current;
+            struct localScopeVariables * oldScope = localScope;
+            localScope = funcValues;
+
+            interp->current = funcSpecs->location;
+            consume_identifier(interp);
+            consume("(",interp);        
+            while(!consume(")",interp)){
+                consume_identifier(interp);
+                consume(",",interp);
+            }
+            consume("{",interp);
+    
+            statements(false,interp);
+
+           
+
+            interp->current = oldLocation;
+            localScope = oldScope;
             return true;
         }
         else

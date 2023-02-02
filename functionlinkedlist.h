@@ -63,5 +63,5 @@ struct functionNode* findFunction(Slice k)
         }
         temp = temp->next;
     }
-    return temp;
+    return NULL;
 }

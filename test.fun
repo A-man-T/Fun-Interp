@@ -1,97 +1,57 @@
-Comment = this * goes * through * extensive * conditional * cases
+print(!!1)
+print(!!!1)
+print(!(!0))
+print(1 > 1)
+print(1 > 0)
+print(0 > 1)
+print(1 >= 1)
+print(1 < 1)
+print(1 <= 1)
+print(1 >= 1 < 1)
+print(0 < 2 == 1)
+a = 20
+print((a))
+print(((a)))
 
-if (4-34) {
-    print(4)
-    if (0) {
-        print(3)
-    } else {
-        print(6)
-    }
-    print(2)
+a1 = 4
+print(a1)
+
+print(a1)
+a1 = a1 + 1
+print(a1)
+
+fun test(a, b, c, a2) {
+print(b)
+}
+print(a)
+
+print(0)
+
+i = 0
+while(i   < 10) {
+i = i + 1
+print(i)
+}
+
+if(1) {
+print(5)
 } else {
-    print(7)
+print(4)
 }
 
-if (0) {
-    if (1) {
-        print(2)
-    }
-    if (2) {
-        print(9)
-        if (2) {
-            print(34)
-        } else {
-            print(45)
-        }
-    }
-}
-
-if (1) {
-    if (2 - 3) {
-        print(5)
-
-    } else {
-        print(6)
-    }
-    print(12)
+if(a == 19) {
+print(5)
 } else {
-    print(12345)
+print(4)
 }
 
-if (1) {
-    if (0) {
-        if (1) {
-            if (0) {
-                if (1) {
-                    if (0) {
-                        if (1) {
-                            if (0) {
-                                if (1) {
-                                    if (0) {
-                                        if (1) {
-                                            if (0) {
-                                                if (1) {
-                                                    if (0) {
-                                                        if (1) {
-                                                            if (0) {
-                                                                if (1) {
-                                                                    if (0) {
-                                                                        if (1) {
-                                                                            if (0) {
-                                                                                if (1) {
-                                                                                    print(12345)
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    print(1)
+if(5) {
+print(100)
 }
 
-x = 0
-if (0) {
-    while(x < 20) {
-        print(x)
-        x = x + 1
-        y = 0
-        while(y < 5) {
-            print(y + 2)
-            y = y + 3
-        }
-    }
+fun testing(really, funny, function) {
+    print(1000)
+    print(really)
 }
+
+testing(1, 2, 3)

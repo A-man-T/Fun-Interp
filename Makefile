@@ -59,3 +59,9 @@ ${OUT_FILES}: %.out : Makefile $B/main %.fun
 clean:
 	rm -rf build
 	rm -f *.diff *.result *.out *.time
+
+debug:
+	gcc -g main.c
+	gdb --tui a.out
+	
+
