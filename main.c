@@ -1,5 +1,6 @@
 #include "cslice.h"
 #include "linkedlist.h"
+#include "functionlinkedlist.h"
 #include "optionalSlice.h"
 #include "optionalInt.h"
 #include <sys/mman.h>
@@ -413,6 +414,35 @@ bool statement(bool effects, Interpreter *interp)
         }
         return true;
     }
+    //need to change this
+    else if (consume("fun",interp))
+    {
+        char const *ptr = interp->current;
+        optionalSlice v = consume_identifier(interp);
+        uint64_t numParams = 0;
+        consume("(",interp);
+        while(!consume(")",interp)){
+            consume_identifier(interp);
+            numParams++;
+            consume(",",interp);
+        }
+        insertFunction(v.value, ptr, numParams);
+        functionNode* toEdit = findFunction(v.value);
+        interp->current = ptr;
+        int currentVar = 0;
+        consume_identifier(interp);
+        consume("(",interp);
+        while(!consume(")",interp)){
+            optionalSlice c = consume_identifier(interp);
+            toEdit->params[currentVar] = c.value;
+            currentVar++;
+            consume(",",interp);
+        }
+        consume("{",interp);
+        skipCurlyBraces(effects, interp);
+        return true;
+        
+    }
     else if (consume("if", interp))
     {
         uint64_t v = expression(effects, interp);
@@ -492,8 +522,7 @@ bool statement(bool effects, Interpreter *interp)
 
 void statements(bool effects, Interpreter *interp)
 {
-    while (statement(effects, interp))
-        ;
+    while (statement(effects, interp));
 }
 
 void run(Interpreter *interp)

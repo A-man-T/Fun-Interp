@@ -21,14 +21,14 @@ fun f2(x,y,z){
     return f1(x,y,z)  
 }
 
-fun f3(x,y,z){
+fun func3(x,y,z){
     while (z!=10){
         z = z+1
     }
     return f2(x,y,z)  
 }
 
-print (f3(x,y,z))
+print (func3(x,y,z))
 print (x)
 print (y)
 print (z)
