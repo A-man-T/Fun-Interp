@@ -36,10 +36,20 @@ void insertLocal(Slice k, uint64_t v){
     
     
     //if it is alr not in the array
-    if(localScope->filledTo+1==localScope->numVariables){
-        localScope->numVariables = localScope->numVariables*2;
-        localScope->names = (struct Slice *)realloc(localScope->names,sizeof(struct Slice)*localScope->numVariables);
-        localScope-> values = (uint64_t *)realloc(localScope->values,sizeof(uint64_t)*localScope->numVariables);
+    if(localScope->filledTo+1>=localScope->numVariables){
+        if(localScope->numVariables == 0){
+            localScope->numVariables++;
+            localScope->names = (struct Slice *)realloc(localScope->names,sizeof(struct Slice)*localScope->numVariables);
+            localScope-> values = (uint64_t *)realloc(localScope->values,sizeof(uint64_t)*localScope->numVariables);
+            localScope->names[localScope->filledTo] = k;
+            localScope->values[localScope->filledTo] = v;
+            return;
+        }
+        else{
+            localScope->numVariables = localScope->numVariables*2;
+            localScope->names = (struct Slice *)realloc(localScope->names,sizeof(struct Slice)*localScope->numVariables);
+            localScope-> values = (uint64_t *)realloc(localScope->values,sizeof(uint64_t)*localScope->numVariables);
+        }
     }
     localScope->filledTo++;
     localScope->names[localScope->filledTo] = k;

@@ -1,57 +1,34 @@
-print(!!1)
-print(!!!1)
-print(!(!0))
-print(1 > 1)
-print(1 > 0)
-print(0 > 1)
-print(1 >= 1)
-print(1 < 1)
-print(1 <= 1)
-print(1 >= 1 < 1)
-print(0 < 2 == 1)
-a = 20
-print((a))
-print(((a)))
-
-a1 = 4
-print(a1)
-
-print(a1)
-a1 = a1 + 1
-print(a1)
-
-fun test(a, b, c, a2) {
-print(b)
+print(!0)
+print(!!0)
+print(1==1)
+print(1==2)
+print(1<2)
+print(2<1)
+print(1>2)
+print(2>1)
+print(1<=1)
+print(1<=2)
+print(2<=1)
+print(1>=1)
+print(1>=2)
+print(2>=1)
+print(1!=1)
+print(1!=2)
+fun testWhileLoop(y){
+    while(y<10){
+        print(y)
+        y = y + 1
+    }
 }
-print(a)
-
-print(0)
-
-i = 0
-while(i   < 10) {
-i = i + 1
-print(i)
+testWhileLoop(5)
+x = 12739172839
+print(x)
+fun testScopingAndRecursion(x){
+    if(x<10){
+        return 1
+    }
+    print(x)
+    return testScopingAndRecursion(x-1)
 }
-
-if(1) {
-print(5)
-} else {
-print(4)
-}
-
-if(a == 19) {
-print(5)
-} else {
-print(4)
-}
-
-if(5) {
-print(100)
-}
-
-fun testing(really, funny, function) {
-    print(1000)
-    print(really)
-}
-
-testing(1, 2, 3)
+print(testScopingAndRecursion(15))
+print(x)
