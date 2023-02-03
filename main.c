@@ -166,11 +166,18 @@ Interpreter newInterp(char const *prog)
 uint64_t e1(bool effects, Interpreter *interp)
 {
 
-    optionalSlice id;
+    optionalSlice id = consume_identifier(interp);
     optionalInt v;
 
-    if (id = consume_identifier(interp), id.hasValue)
+    if (id.hasValue)
     {
+        if(equals(id.value,"print")&&consume("(",interp)){
+            interp->current--;
+            uint64_t v = expression(effects, interp);
+            printf("%" PRIu64 "\n", v);
+            return 0;
+        }
+
         if(consume("(",interp)){
             globalReturnValue = 0;
             returned = false;
@@ -205,7 +212,7 @@ uint64_t e1(bool effects, Interpreter *interp)
     
             statements(false,interp);
 
-           
+           returned = false;
 
             interp->current = oldLocation;
             localScope = oldScope;
@@ -224,11 +231,12 @@ uint64_t e1(bool effects, Interpreter *interp)
         }
         
     }
-    else if (v = consume_literal(interp), v.hasValue)
+    v = consume_literal(interp);
+    if (v.hasValue)
     {
         return v.value;
     }
-    else if (consume("(", interp))
+    if (consume("(", interp))
     {
         uint64_t v = expression(effects, interp);
         consume(")", interp);
@@ -461,12 +469,14 @@ bool statement(bool effects, Interpreter *interp)
 {
     optionalSlice id = consume_identifier(interp);
 
-    if (equals(id.value,"print"))
+    if (equals(id.value,"print")&&consume("(",interp))
     {
-        // print ...
-        uint64_t v = expression(effects, interp);
-        printf("%" PRIu64 "\n", v);
-        return true;
+            interp->current--;
+            // print ...
+            uint64_t v = expression(effects, interp);
+            printf("%" PRIu64 "\n", v);
+            return true;
+        
     }
     //need to change this
     else if (equals(id.value,"fun"))
@@ -516,6 +526,7 @@ bool statement(bool effects, Interpreter *interp)
                 
                 statements(effects, interp);
                 if(returned){
+                    returned = false;
                     return false;
                 }
                 consume("}", interp);
@@ -534,6 +545,7 @@ bool statement(bool effects, Interpreter *interp)
                     consume("{", interp);
                     statements(effects, interp);
                     if(returned){
+                        returned = false;
                         return false;
                     }
                     
@@ -554,6 +566,7 @@ bool statement(bool effects, Interpreter *interp)
                     consume("{", interp);
                     statements(effects, interp);
                     if(returned){
+                        returned = false;
                         return false;
                     }
                     consume("}", interp);
@@ -630,7 +643,7 @@ bool statement(bool effects, Interpreter *interp)
     
             statements(false,interp);
 
-           
+           returned = false;
 
             interp->current = oldLocation;
             localScope = oldScope;
