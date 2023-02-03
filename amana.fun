@@ -2,6 +2,9 @@ x = 20
 y = 18446744073709551616
 z = 1
 a = 420
+ifs = 0 
+whiles = 0
+funct = 0
 fun f1(x,y,z){
     if(y!=0){
         return f1(x,y+1,z)

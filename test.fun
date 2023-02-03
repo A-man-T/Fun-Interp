@@ -1,34 +1,35 @@
-print(!0)
-print(!!0)
-print(1==1)
-print(1==2)
-print(1<2)
-print(2<1)
-print(1>2)
-print(2>1)
-print(1<=1)
-print(1<=2)
-print(2<=1)
-print(1>=1)
-print(1>=2)
-print(2>=1)
-print(1!=1)
-print(1!=2)
-fun testWhileLoop(y){
-    while(y<10){
-        print(y)
-        y = y + 1
-    }
+a = 10
+
+fun x() {
+    print(a)
+    a = 5
+    print(a)
 }
-testWhileLoop(5)
-x = 12739172839
-print(x)
-fun testScopingAndRecursion(x){
-    if(x<10){
-        return 1
-    }
+
+fun y(a, x) {
+    print(x())
     print(x)
-    return testScopingAndRecursion(x-1)
+    print(a)
+    a = 7
+    print(a)
+    return a
 }
-print(testScopingAndRecursion(15))
-print(x)
+
+y(6, 10)
+a = y(a, a)
+print(a)
+
+fun z(b) {
+    while(b == 7 || b == 8) {
+        if(b != 7) {
+            return b
+        }
+        b = b + 1
+    }
+    a = 1
+}
+
+print(z(7))
+print(a)
+print(z(9))
+print(a)

@@ -459,8 +459,9 @@ uint64_t expression(bool effects, Interpreter *interp)
 
 bool statement(bool effects, Interpreter *interp)
 {
-    optionalSlice id;
-    if (consume("print", interp))
+    optionalSlice id = consume_identifier(interp);
+
+    if (equals(id.value,"print"))
     {
         // print ...
         uint64_t v = expression(effects, interp);
@@ -468,7 +469,7 @@ bool statement(bool effects, Interpreter *interp)
         return true;
     }
     //need to change this
-    else if (consume("fun",interp))
+    else if (equals(id.value,"fun"))
     {
         char const *ptr = interp->current;
         optionalSlice v = consume_identifier(interp);
@@ -497,7 +498,7 @@ bool statement(bool effects, Interpreter *interp)
         
     }
     //this broken
-    else if (!effects&&consume("return",interp)){
+    else if (!effects&&equals(id.value,"return")){
         //what goes here
         globalReturnValue = expression(false, interp);
         returned = true;
@@ -505,7 +506,7 @@ bool statement(bool effects, Interpreter *interp)
 
 
     }
-    else if (consume("if", interp))
+    else if (equals(id.value,"if"))
     {
         uint64_t v = expression(effects, interp);
         consume("{", interp);
@@ -541,7 +542,7 @@ bool statement(bool effects, Interpreter *interp)
             }
             return true;
     }
-    else if (consume("while", interp))
+    else if (equals(id.value,"while"))
     {
         char const *reeval = interp->current;
         uint64_t v = expression(effects, interp);
@@ -567,7 +568,7 @@ bool statement(bool effects, Interpreter *interp)
             return true;
     }
 
-    else if (id = consume_identifier(interp), id.hasValue)
+    else if (id.hasValue)
     {
         // x = ...
         if (consume("=", interp))

@@ -47,7 +47,7 @@ inline Slice new_Slice1(char const *const start, char const *const end)
 }
 
 // Compares a Slice to a pointer
-inline bool equals(Slice slice, char const *p)
+bool equals(Slice slice, char const *p)
 {
   for (size_t i = 0; i < slice.len; i++)
   {
