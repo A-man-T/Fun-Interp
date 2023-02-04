@@ -534,26 +534,36 @@ bool statement(bool effects, Interpreter *interp)
                     return false;
                 }
                 consume("}", interp);
+                char const *temp = interp->current;
                 if (consume("else", interp))
                 {
-                    consume("{", interp);
-                    skipCurlyBraces(effects, interp);
+                    if(consume("{", interp))
+                        skipCurlyBraces(effects, interp);
+                    else{
+                        interp->current = temp;
+                        return true;
+                    }
                 }
             }
 
             else
             {
                 skipCurlyBraces(effects, interp);
+                char const *temp = interp->current;
                 if (consume("else", interp))
                 {
-                    consume("{", interp);
-                    statements(effects, interp);
-                    if(returned){
-                      //  returned = false;
-                        return false;
+                    if(consume("{", interp)){
+                        statements(effects, interp);
+                        if(returned){
+                        //  returned = false;
+                            return false;
+                        }
+                        
+                        consume("}", interp);
                     }
-                    
-                    consume("}", interp);
+                    else{
+                        interp->current = temp;
+                    }
                 }
             }
             return true;
