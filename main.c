@@ -212,11 +212,14 @@ uint64_t e1(bool effects, Interpreter *interp)
     
             statements(false,interp);
 
-           returned = false;
+            
+            returned = false;
 
             interp->current = oldLocation;
             localScope = oldScope;
-            return globalReturnValue;
+            int64_t tempHold = globalReturnValue;
+            globalReturnValue = 0;
+            return tempHold;
         }
         else if(effects){
             uint64_t v = find(id.value).value;
@@ -642,6 +645,9 @@ bool statement(bool effects, Interpreter *interp)
             consume("{",interp);
     
             statements(false,interp);
+            
+            
+
 
            returned = false;
 

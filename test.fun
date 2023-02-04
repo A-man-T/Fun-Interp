@@ -1,35 +1,49 @@
-a = 10
+fun Comment(Checks, whether, program, allows, functions, and, variables, to, have, the, same, name) {}
 
-fun x() {
-    print(a)
-    a = 5
-    print(a)
+fun name(x, y, z) {
+    x = x * 10
+    y = x + y
+    z = x * y
+    return z
 }
 
-fun y(a, x) {
-    print(x())
-    print(x)
-    print(a)
-    a = 7
-    print(a)
-    return a
+name = 15000
+name1 = 357892
+name2 = 13579
+
+fun name1(x, y, z) {
+    x = y + 1000
+    return name(x, y, z) + 10
 }
 
-y(6, 10)
-a = y(a, a)
-print(a)
+print(name1(5, 1000, 15))
+print(name)
+print(name1)
+print(name(20, 30, 1000))
 
-fun z(b) {
-    while(b == 7 || b == 8) {
-        if(b != 7) {
-            return b
-        }
-        b = b + 1
-    }
-    a = 1
+name = 50000
+print(name)
+print(name(3, 5000, 17))
+print(name1)
+print(name1(10, 9, 8))
+
+fun name2() {
+    print(name)
+    print(name(20, 30, 1000))
 }
 
-print(z(7))
-print(a)
-print(z(9))
-print(a)
+print(name2)
+print(name2())
+print(name2())
+print(name2())
+print(name2)
+print(name2())
+print(name2)
+print(name2)
+print(name2)
+print(name2)
+print(name2())
+print(name2)
+print(name2())
+print(name2())
+print(name2())
