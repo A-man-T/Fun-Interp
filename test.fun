@@ -1,23 +1,12 @@
 
-fun z(b) {
-    while(b == 7 || b == 8) {
-        if(b != 7) {
-            return b
-        }
-        b = b + 1
-    }
-    a = 1
+fun test(local, variables, should, be, scoped, correctly) {
+    return 0
 }
 
-print(z(7))
+fun main() {
+    return test(1, 1, 1, 1, 1, 1) == 1
+}
 
-
-
-
-
-
-
-
-
-
+rc = main()
+print(rc)
 

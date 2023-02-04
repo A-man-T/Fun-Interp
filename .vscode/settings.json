@@ -5,6 +5,7 @@
         "stat.h": "c",
         "scope": "c",
         "functionlinkedlist.h": "c",
-        "ratio": "c"
+        "ratio": "c",
+        "stdint.h": "c"
     }
 }

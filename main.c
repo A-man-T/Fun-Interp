@@ -17,7 +17,7 @@
 #include <inttypes.h>
 
 uint64_t globalReturnValue = 0;
-//bool returned;
+bool returned;
 
 
 
@@ -180,7 +180,7 @@ uint64_t e1(bool effects, Interpreter *interp)
 
         if(consume("(",interp)){
             globalReturnValue = 0;
-            //returned = false;
+            returned = false;
             struct functionNode * funcSpecs = findFunction(id.value);
             struct localScopeVariables * funcValues = getNewLocalScope(funcSpecs->numParams);
             consume("(",interp);
@@ -213,7 +213,7 @@ uint64_t e1(bool effects, Interpreter *interp)
             statements(false,interp);
 
             
-            //returned = false;
+            returned = false;
 
             interp->current = oldLocation;
             localScope = oldScope;
@@ -514,8 +514,8 @@ bool statement(bool effects, Interpreter *interp)
     else if (!effects&&equals(id.value,"return")){
         //what goes here
         globalReturnValue = expression(false, interp);
-        //returned=true;
-        return false;
+        returned=true;
+        //return false;
         
 
 
@@ -529,10 +529,10 @@ bool statement(bool effects, Interpreter *interp)
             {
                 
                 statements(effects, interp);
-                //if(returned){
-                  //  returned = false;
-                    //return false;
-                //}
+                if(returned){
+                    returned = false;
+                    return false;
+                }
                 consume("}", interp);
                 if (consume("else", interp))
                 {
@@ -548,10 +548,10 @@ bool statement(bool effects, Interpreter *interp)
                 {
                     consume("{", interp);
                     statements(effects, interp);
-                    //if(returned){
-                      //  returned = false;
-                        //return false;
-                    //}
+                    if(returned){
+                        returned = false;
+                        return false;
+                    }
                     
                     consume("}", interp);
                 }
@@ -566,10 +566,10 @@ bool statement(bool effects, Interpreter *interp)
         while (v){
             consume("{", interp);
             statements(effects, interp);
-            //if(returned){
-              //  returned = false;
-                //return false;
-            //}
+            if(returned){
+                returned = false;
+                return false;
+            }
             consume("}", interp);
             interp->current = reeval;
             v = expression(effects, interp);
@@ -612,7 +612,7 @@ bool statement(bool effects, Interpreter *interp)
         }
         else if(findFunction(id.value)!=NULL){
             globalReturnValue = 0;
-            //returned = false;
+            returned = false;
             struct functionNode * funcSpecs = findFunction(id.value);
             struct localScopeVariables * funcValues = getNewLocalScope(funcSpecs->numParams);
             consume("(",interp);
@@ -647,7 +647,7 @@ bool statement(bool effects, Interpreter *interp)
             
 
 
-           //returned = false;
+           returned = false;
 
             interp->current = oldLocation;
             localScope = oldScope;
