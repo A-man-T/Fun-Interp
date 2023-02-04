@@ -562,21 +562,18 @@ bool statement(bool effects, Interpreter *interp)
         char const *reeval = interp->current;
         uint64_t v = expression(effects, interp);
         char const *commands = interp->current;
-            if (v)
-            {
-                while (v)
-                {
-                    consume("{", interp);
-                    statements(effects, interp);
-                    if(returned){
-                        returned = false;
-                        return false;
-                    }
-                    consume("}", interp);
-                    interp->current = reeval;
-                    v = expression(effects, interp);
-                }
+        while (v){
+            consume("{", interp);
+            statements(effects, interp);
+            if(returned){
+                returned = false;
+                return false;
             }
+            consume("}", interp);
+            interp->current = reeval;
+            v = expression(effects, interp);
+                }
+            
 
             interp->current = commands;
             consume("{", interp);
