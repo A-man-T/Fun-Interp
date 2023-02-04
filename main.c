@@ -514,8 +514,8 @@ bool statement(bool effects, Interpreter *interp)
     else if (!effects&&equals(id.value,"return")){
         //what goes here
         globalReturnValue = expression(false, interp);
-        returned=true;
-        //return false;
+        returned = true;
+        return false;
         
 
 
@@ -530,7 +530,7 @@ bool statement(bool effects, Interpreter *interp)
                 
                 statements(effects, interp);
                 if(returned){
-                    returned = false;
+                  //  returned = false;
                     return false;
                 }
                 consume("}", interp);
@@ -549,7 +549,7 @@ bool statement(bool effects, Interpreter *interp)
                     consume("{", interp);
                     statements(effects, interp);
                     if(returned){
-                        returned = false;
+                      //  returned = false;
                         return false;
                     }
                     
@@ -567,13 +567,13 @@ bool statement(bool effects, Interpreter *interp)
             consume("{", interp);
             statements(effects, interp);
             if(returned){
-                returned = false;
+                //returned = false;
                 return false;
             }
             consume("}", interp);
             interp->current = reeval;
             v = expression(effects, interp);
-                }
+        }
             
 
             interp->current = commands;
