@@ -19,8 +19,6 @@
 uint64_t globalReturnValue = 0;
 bool returned;
 
-
-
 typedef struct Interpreter
 {
     char const *const program;
@@ -165,54 +163,70 @@ Interpreter newInterp(char const *prog)
 // () [] . -> ...
 uint64_t e1(bool effects, Interpreter *interp)
 {
+    if (consume("(", interp))
+    {
+        uint64_t v = expression(effects, interp);
+        consume(")", interp);
+        return v;
+    }
+    optionalInt v = consume_literal(interp);
+    if (v.hasValue)
+    {
+        return v.value;
+    }
 
     optionalSlice id = consume_identifier(interp);
-    optionalInt v;
 
     if (id.hasValue)
     {
-        if(equals(id.value,"print")&&consume("(",interp)){
-            interp->current--;
+        if (equals(id.value, "print") && consume("(", interp))
+        {
+            
             uint64_t v = expression(effects, interp);
             printf("%" PRIu64 "\n", v);
+            consume(")", interp);
             return 0;
         }
 
-        if(consume("(",interp)){
+        if (consume("(", interp))
+        {
             globalReturnValue = 0;
             returned = false;
-            struct functionNode * funcSpecs = findFunction(id.value);
-            struct localScopeVariables * funcValues = getNewLocalScope(funcSpecs->numParams);
-            consume("(",interp);
-            for(uint64_t counter = 0; counter<funcSpecs->numParams;counter++){
+            struct functionNode *funcSpecs = findFunction(id.value);
+            struct localScopeVariables *funcValues = getNewLocalScope(funcSpecs->numParams);
+            consume("(", interp);
+            for (uint64_t counter = 0; counter < funcSpecs->numParams; counter++)
+            {
                 uint64_t v = expression(effects, interp);
                 funcValues->values[counter] = v;
                 funcValues->names[counter] = funcSpecs->params[counter];
-                consume(",",interp);
+                consume(",", interp);
             }
-            if(funcSpecs->numParams == 0){
-                 funcValues->filledTo = 0;
+            if (funcSpecs->numParams == 0)
+            {
+                funcValues->filledTo = 0;
             }
-            else{
-                funcValues->filledTo = funcSpecs->numParams-1;
+            else
+            {
+                funcValues->filledTo = funcSpecs->numParams - 1;
             }
-            consume(")",interp);
-            char const *oldLocation= interp->current;
-            struct localScopeVariables * oldScope = localScope;
+            consume(")", interp);
+            char const *oldLocation = interp->current;
+            struct localScopeVariables *oldScope = localScope;
             localScope = funcValues;
 
             interp->current = funcSpecs->location;
             consume_identifier(interp);
-            consume("(",interp);        
-            while(!consume(")",interp)){
+            consume("(", interp);
+            while (!consume(")", interp))
+            {
                 consume_identifier(interp);
-                consume(",",interp);
+                consume(",", interp);
             }
-            consume("{",interp);
-    
-            statements(false,interp);
+            consume("{", interp);
 
-            
+            statements(false, interp);
+
             returned = false;
 
             interp->current = oldLocation;
@@ -221,29 +235,19 @@ uint64_t e1(bool effects, Interpreter *interp)
             globalReturnValue = 0;
             return tempHold;
         }
-        else if(effects){
+        else if (effects)
+        {
             uint64_t v = find(id.value).value;
             return v;
         }
-        else{
+        else
+        {
             optionalInt v = findLocal(id.value);
-            if(v.hasValue)
+            if (v.hasValue)
                 return v.value;
             uint64_t x = find(id.value).value;
             return x;
         }
-        
-    }
-    v = consume_literal(interp);
-    if (v.hasValue)
-    {
-        return v.value;
-    }
-    if (consume("(", interp))
-    {
-        uint64_t v = expression(effects, interp);
-        consume(")", interp);
-        return v;
     }
     else
     {
@@ -257,29 +261,21 @@ uint64_t e1(bool effects, Interpreter *interp)
 uint64_t e2(bool effects, Interpreter *interp)
 {
     uint64_t counter = 0;
-    while (true)
+
+    while (consume("!", interp))
     {
-        if (consume("!", interp))
-        {
-            counter++;
-            while (consume("!", interp))
-            {
-                counter++;
-            }
-        }
-        else
-        {
-            if (counter == 0)
-                return e1(effects, interp);
-            else if (counter % 2 == 0)
-            {
-                return !!e1(effects, interp);
-            }
-            else
-                return !e1(effects, interp);
-        }
+        counter++;
     }
+    if (counter == 0)
+        return e1(effects, interp);
+    else if (counter % 2 == 0)
+    {
+        return !!e1(effects, interp);
+    }
+    else
+        return !e1(effects, interp);
 }
+
 
 // * / % (Left)
 uint64_t e3(bool effects, Interpreter *interp)
@@ -460,7 +456,7 @@ uint64_t e14(bool effects, Interpreter *interp)
 // ,
 uint64_t e15(bool effects, Interpreter *interp)
 {
-    return e14(effects,interp);
+    return e14(effects, interp);
 }
 
 uint64_t expression(bool effects, Interpreter *interp)
@@ -472,124 +468,129 @@ bool statement(bool effects, Interpreter *interp)
 {
     optionalSlice id = consume_identifier(interp);
 
-    if (equals(id.value,"print")&&consume("(",interp))
+    if (equals(id.value, "print") && consume("(", interp))
     {
-            interp->current--;
-            // print ...
-            uint64_t v = expression(effects, interp);
-            printf("%" PRIu64 "\n", v);
-            return true;
-        
+       
+        // print ...
+        uint64_t v = expression(effects, interp);
+        printf("%" PRIu64 "\n", v);
+        consume(")", interp);
+        return true;
     }
-    //need to change this
-    else if (equals(id.value,"fun"))
+    // need to change this
+    else if (equals(id.value, "fun"))
     {
         char const *ptr = interp->current;
         optionalSlice v = consume_identifier(interp);
         uint64_t numParams = 0;
-        consume("(",interp);
-        while(!consume(")",interp)){
+        consume("(", interp);
+        while (!consume(")", interp))
+        {
             consume_identifier(interp);
             numParams++;
-            consume(",",interp);
+            consume(",", interp);
         }
         insertFunction(v.value, ptr, numParams);
-        functionNode* toEdit = findFunction(v.value);
+        functionNode *toEdit = findFunction(v.value);
         interp->current = ptr;
         int currentVar = 0;
         consume_identifier(interp);
-        consume("(",interp);
-        while(!consume(")",interp)){
+        consume("(", interp);
+        while (!consume(")", interp))
+        {
             optionalSlice c = consume_identifier(interp);
             toEdit->params[currentVar] = c.value;
             currentVar++;
-            consume(",",interp);
+            consume(",", interp);
         }
-        consume("{",interp);
+        consume("{", interp);
         skipCurlyBraces(effects, interp);
         return true;
-        
     }
-    //this broken
-    else if (!effects&&equals(id.value,"return")){
-        //what goes here
+    // this broken
+    else if (!effects && equals(id.value, "return"))
+    {
+        // what goes here
         globalReturnValue = expression(false, interp);
         returned = true;
         return false;
-        
-
-
     }
-    else if (equals(id.value,"if"))
+    else if (equals(id.value, "if"))
     {
         uint64_t v = expression(effects, interp);
         consume("{", interp);
 
-            if (v)
-            {
-                
-                statements(effects, interp);
-                if(returned){
-                  //  returned = false;
-                    return false;
-                }
-                consume("}", interp);
-                char const *temp = interp->current;
-                if (consume("else", interp))
-                {
-                    if(consume("{", interp))
-                        skipCurlyBraces(effects, interp);
-                    else{
-                        interp->current = temp;
-                        return true;
-                    }
-                }
-            }
+        if (v)
+        {
 
-            else
+            statements(effects, interp);
+            if (returned)
             {
-                skipCurlyBraces(effects, interp);
-                char const *temp = interp->current;
-                if (consume("else", interp))
+                //  returned = false;
+                return false;
+            }
+            consume("}", interp);
+            char const *temp = interp->current;
+            if (consume("else", interp))
+            {
+                if (consume("{", interp))
+                    skipCurlyBraces(effects, interp);
+                else
                 {
-                    if(consume("{", interp)){
-                        statements(effects, interp);
-                        if(returned){
-                        //  returned = false;
-                            return false;
-                        }
-                        
-                        consume("}", interp);
-                    }
-                    else{
-                        interp->current = temp;
-                    }
+                    interp->current = temp;
+                    return true;
                 }
             }
-            return true;
+        }
+
+        else
+        {
+            skipCurlyBraces(effects, interp);
+            char const *temp = interp->current;
+            if (consume("else", interp))
+            {
+                if (consume("{", interp))
+                {
+                    statements(effects, interp);
+                    if (returned)
+                    {
+                        //  returned = false;
+                        return false;
+                    }
+
+                    consume("}", interp);
+                }
+                else
+                {
+                    interp->current = temp;
+                }
+            }
+        }
+        return true;
     }
-    else if (equals(id.value,"while"))
+    else if (equals(id.value, "while"))
     {
         char const *reeval = interp->current;
         uint64_t v = expression(effects, interp);
         char const *commands = interp->current;
-        while (v){
+        while (v)
+        {
             consume("{", interp);
             statements(effects, interp);
-            if(returned){
-                //returned = false;
+            if (returned)
+            {
+                // returned = false;
                 return false;
             }
             consume("}", interp);
             interp->current = reeval;
             v = expression(effects, interp);
         }
-            
 
-            interp->current = commands;
-            consume("{", interp);
-            skipCurlyBraces(effects, interp);
-            return true;
+        interp->current = commands;
+        consume("{", interp);
+        skipCurlyBraces(effects, interp);
+        return true;
     }
 
     else if (id.hasValue)
@@ -602,62 +603,67 @@ bool statement(bool effects, Interpreter *interp)
             {
                 insert(id.value, v);
             }
-            else{
+            else
+            {
                 optionalInt x = findLocal(id.value);
-                if(x.hasValue){
-                    insertLocal(id.value,v);
+                if (x.hasValue)
+                {
+                    insertLocal(id.value, v);
                     return true;
                 }
-                else if(find(id.value).hasValue){
-                    insert(id.value,v);
+                else if (find(id.value).hasValue)
+                {
+                    insert(id.value, v);
                 }
-                else{
-                    insertLocal(id.value,v);
+                else
+                {
+                    insertLocal(id.value, v);
                 }
-            
 
-                //write the code to check if in local, then check global, then add to local
+                // write the code to check if in local, then check global, then add to local
             }
             return true;
         }
-        else if(findFunction(id.value)!=NULL){
+        else if (findFunction(id.value) != NULL)
+        {
             globalReturnValue = 0;
             returned = false;
-            struct functionNode * funcSpecs = findFunction(id.value);
-            struct localScopeVariables * funcValues = getNewLocalScope(funcSpecs->numParams);
-            consume("(",interp);
-            for(uint64_t counter = 0; counter<funcSpecs->numParams;counter++){
+            struct functionNode *funcSpecs = findFunction(id.value);
+            struct localScopeVariables *funcValues = getNewLocalScope(funcSpecs->numParams);
+            consume("(", interp);
+            for (uint64_t counter = 0; counter < funcSpecs->numParams; counter++)
+            {
                 uint64_t v = expression(effects, interp);
                 funcValues->values[counter] = v;
                 funcValues->names[counter] = funcSpecs->params[counter];
-                consume(",",interp);
+                consume(",", interp);
             }
-            if(funcSpecs->numParams == 0){
-                 funcValues->filledTo = 0;
+            if (funcSpecs->numParams == 0)
+            {
+                funcValues->filledTo = 0;
             }
-            else{
-                funcValues->filledTo = funcSpecs->numParams-1;
+            else
+            {
+                funcValues->filledTo = funcSpecs->numParams - 1;
             }
-            consume(")",interp);
+            consume(")", interp);
             char const *oldLocation = interp->current;
-            struct localScopeVariables * oldScope = localScope;
+            struct localScopeVariables *oldScope = localScope;
             localScope = funcValues;
 
             interp->current = funcSpecs->location;
             consume_identifier(interp);
-            consume("(",interp);        
-            while(!consume(")",interp)){
+            consume("(", interp);
+            while (!consume(")", interp))
+            {
                 consume_identifier(interp);
-                consume(",",interp);
+                consume(",", interp);
             }
-            consume("{",interp);
-    
-            statements(false,interp);
-            
-            
+            consume("{", interp);
 
+            statements(false, interp);
 
-           returned = false;
+            returned = false;
 
             interp->current = oldLocation;
             localScope = oldScope;
@@ -673,7 +679,8 @@ bool statement(bool effects, Interpreter *interp)
 
 void statements(bool effects, Interpreter *interp)
 {
-    while (statement(effects, interp));
+    while (statement(effects, interp))
+        ;
 }
 
 void run(Interpreter *interp)
