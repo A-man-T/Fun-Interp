@@ -667,6 +667,7 @@ bool statement(bool effects, Interpreter *interp)
 
             interp->current = oldLocation;
             localScope = oldScope;
+            globalReturnValue = 0;
             return true;
         }
         else
@@ -679,8 +680,7 @@ bool statement(bool effects, Interpreter *interp)
 
 void statements(bool effects, Interpreter *interp)
 {
-    while (statement(effects, interp))
-        ;
+    while (statement(effects, interp));
 }
 
 void run(Interpreter *interp)
