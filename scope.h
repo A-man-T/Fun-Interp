@@ -17,6 +17,12 @@ typedef struct localScopeVariables
 
 struct localScopeVariables *localScope = NULL;
 
+
+void freeInside(){
+    free(localScope->names);
+    free(localScope->values);
+}
+
 struct localScopeVariables *getNewLocalScope(uint64_t num){
     struct localScopeVariables *newScope = (struct localScopeVariables *)malloc(sizeof(struct localScopeVariables));
     newScope-> names = (struct Slice *)malloc(sizeof(struct Slice)*num);

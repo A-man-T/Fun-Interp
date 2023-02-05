@@ -181,7 +181,7 @@ uint64_t e1(bool effects, Interpreter *interp)
     {
         if (equals(id.value, "print") && consume("(", interp))
         {
-            
+
             uint64_t v = expression(effects, interp);
             printf("%" PRIu64 "\n", v);
             consume(")", interp);
@@ -230,6 +230,8 @@ uint64_t e1(bool effects, Interpreter *interp)
             returned = false;
 
             interp->current = oldLocation;
+            freeInside();
+            free(localScope);
             localScope = oldScope;
             int64_t tempHold = globalReturnValue;
             globalReturnValue = 0;
@@ -275,7 +277,6 @@ uint64_t e2(bool effects, Interpreter *interp)
     else
         return !e1(effects, interp);
 }
-
 
 // * / % (Left)
 uint64_t e3(bool effects, Interpreter *interp)
@@ -470,7 +471,7 @@ bool statement(bool effects, Interpreter *interp)
 
     if (equals(id.value, "print") && consume("(", interp))
     {
-       
+
         // print ...
         uint64_t v = expression(effects, interp);
         printf("%" PRIu64 "\n", v);
@@ -666,6 +667,8 @@ bool statement(bool effects, Interpreter *interp)
             returned = false;
 
             interp->current = oldLocation;
+            freeInside();
+            free(localScope);
             localScope = oldScope;
             globalReturnValue = 0;
             return true;
@@ -680,7 +683,8 @@ bool statement(bool effects, Interpreter *interp)
 
 void statements(bool effects, Interpreter *interp)
 {
-    while (statement(effects, interp));
+    while (statement(effects, interp))
+        ;
 }
 
 void run(Interpreter *interp)
