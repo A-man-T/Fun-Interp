@@ -1,8 +1,27 @@
-
 - What is an abstract syntax tree?
+
+An abstract syntax tree is a tree representation of code that can be evaluated to the same result as the source code. The most typical way an 
+AST works is that it creates a tree representation of the code and then evaluates it to output the expected output of the source code. It goes 
+into the structure hierarchy of how the code works and simplifies the code. Going into more detail, every node has a type which shows what it 
+holds (similar to consume_id and consume_literal) and the connections represent the hierarchy of the syntax.
+
 
 - Why is it useful?
 
+There are numerous reasons why an AST is useful. Most notably, when code is decomposed into an AST unnecessary punctuation and syntax such as curly braces
+are removed, making it significantly easier to process and execute code. In other words, it abstracts away details that may convolute the program. 
+Furthermore, an AST usually is more useful in debugging code due to the  consecutive levels of analysis during execution, allowing a compiler 
+to understand the state of the program during different parts and print more useful error messages. There are other uses such as editing 
+nodes to change the output without editing code.
+
+
+Source: https://www.twilio.com/blog/abstract-syntax-trees
+
 - Did you use one in your solution? Explain why/why-not
 
-no i used continous parsing
+No, I did not use an AST in my solution. First, I didn't construct the tree to evaluate the code, for example the statements function doesn't function like an
+AST does, instead it uses continuous recursive parsing where we evaluate statements as we arrive at them. That said, the logic part of the program could be 
+argued to function like an AST. For example if you consider how or statements are evaluated, it evaluates them very similarly to an AST.
+However, overall my solution doesn't use an AST, despite having some AST-like elements. 
+
+
