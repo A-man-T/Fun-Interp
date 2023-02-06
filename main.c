@@ -17,6 +17,7 @@
 #include <inttypes.h>
 
 uint64_t globalReturnValue = 0;
+// bool to keep track if the current function has returned
 bool returned;
 
 typedef struct Interpreter
@@ -60,6 +61,7 @@ bool consume(const char *str, Interpreter *interp)
     }
 }
 
+// function that skips the interp->current pointer to the end of the loop and/or function by keeping track of curly braces
 void skipCurlyBraces(bool effects, Interpreter *interp)
 {
     uint64_t countBraces = 1;
@@ -179,6 +181,7 @@ uint64_t e1(bool effects, Interpreter *interp)
 
     if (id.hasValue)
     {
+        // Treats print as a function if evaluated as an expression
         if (equals(id.value, "print") && consume("(", interp))
         {
 
@@ -187,7 +190,7 @@ uint64_t e1(bool effects, Interpreter *interp)
             consume(")", interp);
             return 0;
         }
-
+        // Calls a function
         if (consume("(", interp))
         {
             globalReturnValue = 0;
@@ -237,11 +240,13 @@ uint64_t e1(bool effects, Interpreter *interp)
             globalReturnValue = 0;
             return tempHold;
         }
+        // Effects is used to indicate if we are in a function, if we aren't effects = true, and we only check the globalScope
         else if (effects)
         {
             uint64_t v = find(id.value).value;
             return v;
         }
+        // Otherwise we check the local, then global, then insert into the local per the spec
         else
         {
             optionalInt v = findLocal(id.value);
@@ -478,7 +483,7 @@ bool statement(bool effects, Interpreter *interp)
         consume(")", interp);
         return true;
     }
-    // need to change this
+    // Stores the function information in the function linkedlist
     else if (equals(id.value, "fun"))
     {
         char const *ptr = interp->current;
@@ -508,10 +513,9 @@ bool statement(bool effects, Interpreter *interp)
         skipCurlyBraces(effects, interp);
         return true;
     }
-    // this broken
+    // This allows the rest of the program to know that we need to return out of a fucntion
     else if (!effects && equals(id.value, "return"))
     {
-        // what goes here
         globalReturnValue = expression(false, interp);
         returned = true;
         return false;
@@ -527,7 +531,7 @@ bool statement(bool effects, Interpreter *interp)
             statements(effects, interp);
             if (returned)
             {
-                //  returned = false;
+                // Stops the rest of the if statement
                 return false;
             }
             consume("}", interp);
@@ -555,7 +559,7 @@ bool statement(bool effects, Interpreter *interp)
                     statements(effects, interp);
                     if (returned)
                     {
-                        //  returned = false;
+
                         return false;
                     }
 
@@ -600,10 +604,12 @@ bool statement(bool effects, Interpreter *interp)
         if (consume("=", interp))
         {
             uint64_t v = expression(effects, interp);
+            // Runs if in global Scope
             if (effects)
             {
                 insert(id.value, v);
             }
+            // If in local Scope check if in local, then check global, then add to local
             else
             {
                 optionalInt x = findLocal(id.value);
@@ -620,11 +626,10 @@ bool statement(bool effects, Interpreter *interp)
                 {
                     insertLocal(id.value, v);
                 }
-
-                // write the code to check if in local, then check global, then add to local
             }
             return true;
         }
+        // Run a function
         else if (findFunction(id.value) != NULL)
         {
             globalReturnValue = 0;

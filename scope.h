@@ -4,7 +4,7 @@
 #include "cslice.h"
 #include "optionalInt.h"
 
-// LinkedList Node
+// This is a struct to keep track of the current variables and their values
 typedef struct localScopeVariables
 {
     uint64_t numVariables;
@@ -17,12 +17,13 @@ typedef struct localScopeVariables
 
 struct localScopeVariables *localScope = NULL;
 
-
+//Frees all the malloc memory
 void freeInside(){
     free(localScope->names);
     free(localScope->values);
 }
 
+//creates a new localScope with the function data
 struct localScopeVariables *getNewLocalScope(uint64_t num){
     struct localScopeVariables *newScope = (struct localScopeVariables *)malloc(sizeof(struct localScopeVariables));
     newScope-> names = (struct Slice *)malloc(sizeof(struct Slice)*num);
@@ -41,7 +42,7 @@ void insertLocal(Slice k, uint64_t v){
     }
     
     
-    //if it is alr not in the array
+    //Resize the array
     if(localScope->filledTo+1>=localScope->numVariables){
         if(localScope->numVariables == 0){
             localScope->numVariables++;

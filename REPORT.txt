@@ -5,3 +5,4 @@
 
 - Did you use one in your solution? Explain why/why-not
 
+no i used continous parsing
