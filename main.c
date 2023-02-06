@@ -28,6 +28,7 @@ typedef struct Interpreter
 
 uint64_t expression(bool effects, Interpreter *interp);
 void statements(bool effects, Interpreter *interp);
+void runFunction(bool effects, Interpreter *interp, optionalSlice id);
 
 void skip(Interpreter *interp)
 {
@@ -193,49 +194,7 @@ uint64_t e1(bool effects, Interpreter *interp)
         // Calls a function
         if (consume("(", interp))
         {
-            globalReturnValue = 0;
-            returned = false;
-            struct functionNode *funcSpecs = findFunction(id.value);
-            struct localScopeVariables *funcValues = getNewLocalScope(funcSpecs->numParams);
-            consume("(", interp);
-            for (uint64_t counter = 0; counter < funcSpecs->numParams; counter++)
-            {
-                uint64_t v = expression(effects, interp);
-                funcValues->values[counter] = v;
-                funcValues->names[counter] = funcSpecs->params[counter];
-                consume(",", interp);
-            }
-            if (funcSpecs->numParams == 0)
-            {
-                funcValues->filledTo = 0;
-            }
-            else
-            {
-                funcValues->filledTo = funcSpecs->numParams - 1;
-            }
-            consume(")", interp);
-            char const *oldLocation = interp->current;
-            struct localScopeVariables *oldScope = localScope;
-            localScope = funcValues;
-
-            interp->current = funcSpecs->location;
-            consume_identifier(interp);
-            consume("(", interp);
-            while (!consume(")", interp))
-            {
-                consume_identifier(interp);
-                consume(",", interp);
-            }
-            consume("{", interp);
-
-            statements(false, interp);
-
-            returned = false;
-
-            interp->current = oldLocation;
-            freeInside();
-            free(localScope);
-            localScope = oldScope;
+            runFunction(effects, interp, id);
             int64_t tempHold = globalReturnValue;
             globalReturnValue = 0;
             return tempHold;
@@ -490,6 +449,7 @@ bool statement(bool effects, Interpreter *interp)
         optionalSlice v = consume_identifier(interp);
         uint64_t numParams = 0;
         consume("(", interp);
+        // counts number of parameters
         while (!consume(")", interp))
         {
             consume_identifier(interp);
@@ -502,6 +462,7 @@ bool statement(bool effects, Interpreter *interp)
         int currentVar = 0;
         consume_identifier(interp);
         consume("(", interp);
+        // stores the names of the parameters
         while (!consume(")", interp))
         {
             optionalSlice c = consume_identifier(interp);
@@ -632,49 +593,7 @@ bool statement(bool effects, Interpreter *interp)
         // Run a function
         else if (findFunction(id.value) != NULL)
         {
-            globalReturnValue = 0;
-            returned = false;
-            struct functionNode *funcSpecs = findFunction(id.value);
-            struct localScopeVariables *funcValues = getNewLocalScope(funcSpecs->numParams);
-            consume("(", interp);
-            for (uint64_t counter = 0; counter < funcSpecs->numParams; counter++)
-            {
-                uint64_t v = expression(effects, interp);
-                funcValues->values[counter] = v;
-                funcValues->names[counter] = funcSpecs->params[counter];
-                consume(",", interp);
-            }
-            if (funcSpecs->numParams == 0)
-            {
-                funcValues->filledTo = 0;
-            }
-            else
-            {
-                funcValues->filledTo = funcSpecs->numParams - 1;
-            }
-            consume(")", interp);
-            char const *oldLocation = interp->current;
-            struct localScopeVariables *oldScope = localScope;
-            localScope = funcValues;
-
-            interp->current = funcSpecs->location;
-            consume_identifier(interp);
-            consume("(", interp);
-            while (!consume(")", interp))
-            {
-                consume_identifier(interp);
-                consume(",", interp);
-            }
-            consume("{", interp);
-
-            statements(false, interp);
-
-            returned = false;
-
-            interp->current = oldLocation;
-            freeInside();
-            free(localScope);
-            localScope = oldScope;
+            runFunction(effects, interp, id);
             globalReturnValue = 0;
             return true;
         }
@@ -696,6 +615,55 @@ void run(Interpreter *interp)
 {
     statements(true, interp);
     end_or_fail(interp);
+}
+
+// code to run a function
+void runFunction(bool effects, Interpreter *interp, optionalSlice id)
+{
+    globalReturnValue = 0;
+    returned = false;
+    struct functionNode *funcSpecs = findFunction(id.value);
+    struct localScopeVariables *funcValues = getNewLocalScope(funcSpecs->numParams);
+    consume("(", interp);
+    // stores the params
+    for (uint64_t counter = 0; counter < funcSpecs->numParams; counter++)
+    {
+        uint64_t v = expression(effects, interp);
+        funcValues->values[counter] = v;
+        funcValues->names[counter] = funcSpecs->params[counter];
+        consume(",", interp);
+    }
+    if (funcSpecs->numParams == 0)
+    {
+        funcValues->filledTo = 0;
+    }
+    else
+    {
+        funcValues->filledTo = funcSpecs->numParams - 1;
+    }
+    consume(")", interp);
+    char const *oldLocation = interp->current;
+    struct localScopeVariables *oldScope = localScope;
+    localScope = funcValues;
+
+    interp->current = funcSpecs->location;
+    consume_identifier(interp);
+    consume("(", interp);
+    while (!consume(")", interp))
+    {
+        consume_identifier(interp);
+        consume(",", interp);
+    }
+    consume("{", interp);
+
+    statements(false, interp);
+
+    returned = false;
+
+    interp->current = oldLocation;
+    freeInside();
+    free(localScope);
+    localScope = oldScope;
 }
 
 int main(int argc, const char *const *const argv)
